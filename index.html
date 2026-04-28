@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulación del juego Yahtzee clásico para 2 jugadores usando el método de Montecarlo">
+    <title>Yahtzee Montecarlo — Simulación de Dados</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ============ SPLASH / START SCREEN ============ -->
+    <div id="startScreen" class="screen active">
+        <div class="splash-container">
+            <div class="logo-dice-row">
+                <span class="logo-die" data-face="5">⚄</span>
+                <span class="logo-die" data-face="3">⚂</span>
+                <span class="logo-die" data-face="6">⚅</span>
+                <span class="logo-die" data-face="2">⚁</span>
+                <span class="logo-die" data-face="4">⚃</span>
+            </div>
+            <h1 class="splash-title">YAHTZEE</h1>
+            <p class="splash-subtitle">Simulación Montecarlo · 2 Jugadores</p>
+            <div class="player-names">
+                <div class="name-field">
+                    <label for="player1Name">Jugador 1</label>
+                    <input type="text" id="player1Name" placeholder="Nombre…" maxlength="15" value="Jugador 1">
+                </div>
+                <div class="name-field">
+                    <label for="player2Name">Jugador 2</label>
+                    <input type="text" id="player2Name" placeholder="Nombre…" maxlength="15" value="Jugador 2">
+                </div>
+            </div>
+            <button id="btnStartGame" class="btn-primary pulse">
+                <span>🎲</span> Iniciar Partida
+            </button>
+            <button id="btnShowStats" class="btn-secondary">
+                <span>📊</span> Simulación Montecarlo
+            </button>
+        </div>
+    </div>
+
+    <!-- ============ GAME SCREEN ============ -->
+    <div id="gameScreen" class="screen">
+        <header class="game-header">
+            <div class="header-left">
+                <h2 class="game-logo">YAHTZEE</h2>
+            </div>
+            <div class="header-center">
+                <div id="turnIndicator" class="turn-indicator">
+                    <span id="currentPlayerLabel">Turno de Jugador 1</span>
+                    <span id="rollCounter" class="roll-badge">Lanzamiento 1/3</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="btnBackToMenu" class="btn-icon" title="Volver al menú">✕</button>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <!-- DICE AREA -->
+            <section class="dice-area">
+                <div class="dice-tray" id="diceTray">
+                    <div class="die" data-index="0" id="die0">
+                        <div class="die-inner">
+                            <div class="die-face">?</div>
+                        </div>
+                        <span class="keep-badge">GUARDAR</span>
+                    </div>
+                    <div class="die" data-index="1" id="die1">
+                        <div class="die-inner">
+                            <div class="die-face">?</div>
+                        </div>
+                        <span class="keep-badge">GUARDAR</span>
+                    </div>
+                    <div class="die" data-index="2" id="die2">
+                        <div class="die-inner">
+                            <div class="die-face">?</div>
+                        </div>
+                        <span class="keep-badge">GUARDAR</span>
+                    </div>
+                    <div class="die" data-index="3" id="die3">
+                        <div class="die-inner">
+                            <div class="die-face">?</div>
+                        </div>
+                        <span class="keep-badge">GUARDAR</span>
+                    </div>
+                    <div class="die" data-index="4" id="die4">
+                        <div class="die-inner">
+                            <div class="die-face">?</div>
+                        </div>
+                        <span class="keep-badge">GUARDAR</span>
+                    </div>
+                </div>
+                <button id="btnRoll" class="btn-roll">
+                    <span class="roll-icon">🎲</span> Lanzar Dados
+                </button>
+            </section>
+
+            <!-- SCORECARD -->
+            <section class="scorecard-area">
+                <div class="scorecard glass-card">
+                    <table id="scorecardTable">
+                        <thead>
+                            <tr>
+                                <th class="cat-col">Categoría</th>
+                                <th class="score-col" id="p1Header">J1</th>
+                                <th class="score-col" id="p2Header">J2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upperSection">
+                            <tr class="section-label"><td colspan="3">SECCIÓN SUPERIOR</td></tr>
+                            <tr data-category="ones"><td><span class="cat-icon">⚀</span> Unos</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="twos"><td><span class="cat-icon">⚁</span> Doses</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="threes"><td><span class="cat-icon">⚂</span> Treses</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="fours"><td><span class="cat-icon">⚃</span> Cuatros</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="fives"><td><span class="cat-icon">⚄</span> Cincos</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="sixes"><td><span class="cat-icon">⚅</span> Seises</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr class="subtotal-row"><td>Subtotal Superior</td><td id="upperTotal0">0</td><td id="upperTotal1">0</td></tr>
+                            <tr class="bonus-row"><td>Bono (≥63 → +35)</td><td id="bonus0">0</td><td id="bonus1">0</td></tr>
+                        </tbody>
+                        <tbody id="lowerSection">
+                            <tr class="section-label"><td colspan="3">SECCIÓN INFERIOR</td></tr>
+                            <tr data-category="threeOfKind"><td><span class="cat-icon">🎯</span> Tercia</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="fourOfKind"><td><span class="cat-icon">🎯</span> Póker</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="fullHouse"><td><span class="cat-icon">🏠</span> Full House</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="smallStraight"><td><span class="cat-icon">📏</span> Esc. Corta</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="largeStraight"><td><span class="cat-icon">📐</span> Esc. Larga</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="yahtzee"><td><span class="cat-icon">⭐</span> Yahtzee</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                            <tr data-category="chance"><td><span class="cat-icon">🍀</span> Chance</td><td class="p1" data-player="0"></td><td class="p2" data-player="1"></td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row"><td>TOTAL</td><td id="grandTotal0">0</td><td id="grandTotal1">0</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast notifications -->
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <!-- ============ GAME OVER OVERLAY ============ -->
+    <div id="gameOverOverlay" class="overlay hidden">
+        <div class="overlay-card glass-card">
+            <h2 class="overlay-title">🏆 Fin del Juego</h2>
+            <div id="gameOverContent" class="overlay-content"></div>
+            <div class="overlay-actions">
+                <button id="btnPlayAgain" class="btn-primary">Jugar de Nuevo</button>
+                <button id="btnGoMenu" class="btn-secondary">Menú Principal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MONTECARLO SCREEN ============ -->
+    <div id="montecarloScreen" class="screen">
+        <header class="game-header">
+            <div class="header-left">
+                <h2 class="game-logo">📊 MONTECARLO</h2>
+            </div>
+            <div class="header-center">
+                <p class="mc-subtitle">Simulación de Distribución de Probabilidades</p>
+            </div>
+            <div class="header-right">
+                <button id="btnBackFromMC" class="btn-icon" title="Volver">✕</button>
+            </div>
+        </header>
+
+        <main class="mc-main">
+            <section class="mc-controls glass-card">
+                <h3>Configuración de Simulación</h3>
+                <div class="mc-field-row">
+                    <div class="mc-field">
+                        <label for="mcIterations">Número de lanzamientos</label>
+                        <input type="number" id="mcIterations" value="10000" min="100" max="1000000" step="1000">
+                    </div>
+                    <div class="mc-field">
+                        <label for="mcDiceCount">Cantidad de dados</label>
+                        <select id="mcDiceCount">
+                            <option value="1">1 dado</option>
+                            <option value="2">2 dados</option>
+                            <option value="5" selected>5 dados (Yahtzee)</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="btnRunMC" class="btn-primary">
+                    <span>▶</span> Ejecutar Simulación
+                </button>
+                <div id="mcProgress" class="mc-progress hidden">
+                    <div class="progress-bar"><div id="mcBar" class="progress-fill"></div></div>
+                    <span id="mcPercent">0%</span>
+                </div>
+            </section>
+
+            <section class="mc-results hidden" id="mcResults">
+                <div class="mc-stats-grid">
+                    <div class="mc-stat glass-card">
+                        <span class="mc-stat-label">Lanzamientos</span>
+                        <span class="mc-stat-value" id="statTotal">0</span>
+                    </div>
+                    <div class="mc-stat glass-card">
+                        <span class="mc-stat-label">Media (suma)</span>
+                        <span class="mc-stat-value" id="statMean">0</span>
+                    </div>
+                    <div class="mc-stat glass-card">
+                        <span class="mc-stat-label">Desv. Estándar</span>
+                        <span class="mc-stat-value" id="statStdDev">0</span>
+                    </div>
+                    <div class="mc-stat glass-card">
+                        <span class="mc-stat-label">Mínimo</span>
+                        <span class="mc-stat-value" id="statMin">0</span>
+                    </div>
+                    <div class="mc-stat glass-card">
+                        <span class="mc-stat-label">Máximo</span>
+                        <span class="mc-stat-value" id="statMax">0</span>
+                    </div>
+                    <div class="mc-stat glass-card highlight">
+                        <span class="mc-stat-label">P(Yahtzee)</span>
+                        <span class="mc-stat-value" id="statYahtzee">0%</span>
+                    </div>
+                </div>
+
+                <div class="mc-charts-grid">
+                    <div class="mc-chart-card glass-card">
+                        <h4>Distribución de Frecuencias (Suma de Dados)</h4>
+                        <canvas id="chartHistogram"></canvas>
+                    </div>
+                    <div class="mc-chart-card glass-card">
+                        <h4>Frecuencia por Cara Individual</h4>
+                        <canvas id="chartFaces"></canvas>
+                    </div>
+                    <div class="mc-chart-card glass-card">
+                        <h4>Probabilidad de Combinaciones Yahtzee</h4>
+                        <canvas id="chartCombinations"></canvas>
+                    </div>
+                    <div class="mc-chart-card glass-card">
+                        <h4>Convergencia de la Media</h4>
+                        <canvas id="chartConvergence"></canvas>
+                    </div>
+                </div>
+
+                <div class="mc-table-card glass-card">
+                    <h4>Tabla de Probabilidades Estimadas vs. Teóricas</h4>
+                    <div class="table-scroll">
+                        <table id="mcProbTable">
+                            <thead>
+                                <tr>
+                                    <th>Combinación</th>
+                                    <th>Prob. Teórica</th>
+                                    <th>Prob. Simulada</th>
+                                    <th>Error (%)</th>
+                                    <th>Frecuencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mcProbBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="game.js"></script>
+    <script src="montecarlo.js"></script>
+</body>
+</html>
